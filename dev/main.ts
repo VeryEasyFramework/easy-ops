@@ -1,22 +1,43 @@
-import { runCommand } from "@vef/easy-command";
-import { SSHSession } from "../src/ssh/sshConnect.ts";
-import { ConnectionReader } from "../src/ssh/connectionReader.ts";
+import { CommandSession } from "../src/commandSession.ts";
+import { GitOp } from "../src/git/gitOp.ts";
+import { OpGroup, TaskResult } from "../src/opTask.ts";
 
-export class EasyOp {
-  title: string = "EasyOp";
+export class EasyOps {
+  session: CommandSession;
+  git: GitOp;
 
-  description: string =
-    "EasyOp is a simple and easy to use library for developers.";
+  tasks: Array<() => Promise<TaskResult>> = [];
   constructor() {
-    console.log("EasyOp");
+    this.session = new CommandSession();
+    this.git = new GitOp();
+    this.git.bindOp(this);
+  }
+  async init() {
+    await this.session.start();
+  }
+
+  async run() {
+    for (const task of this.tasks) {
+      await this.runTask(task);
+    }
+  }
+
+  private async runTask(task: () => Promise<TaskResult>) {
+    const result = await task();
+    console.log(result);
+  }
+
+  addTask(task: () => Promise<TaskResult>) {
+    this.tasks.push(task);
   }
 }
 
-const session = new SSHSession({
-  host: "checker.veracityads.com",
-  user: "ubuntu",
-});
+const easyOps = new EasyOps();
 
-await session.connect();
+easyOps.init();
 
-console.log("Connected");
+easyOps.git.tasks.pull.add();
+
+easyOps.run();
+
+// session.close();

@@ -75,93 +75,11 @@ const controlChars = {
 
   // 8-bit control characters
   NBSP: 0xa0,
-  "¡": 0xa1,
-  "¢": 0xa2,
-  "£": 0xa3,
-  "¤": 0xa4,
-  "¥": 0xa5,
-  "¦": 0xa6,
-  "§": 0xa7,
-  "¨": 0xa8,
-  "©": 0xa9,
-  "ª": 0xaa,
-  "«": 0xab,
-
-  "¬": 0xac,
-  "­": 0xad,
-  "®": 0xae,
-  "¯": 0xaf,
-  "°": 0xb0,
-  "±": 0xb1,
-  "²": 0xb2,
-  "³": 0xb3,
-  "´": 0xb4,
-  "µ": 0xb5,
-  "¶": 0xb6,
-  "·": 0xb7,
-  "¸": 0xb8,
-  "¹": 0xb9,
-  "º": 0xba,
-  "»": 0xbb,
-  "¼": 0xbc,
-  "½": 0xbd,
-  "¾": 0xbe,
-  "¿": 0xbf,
-  "À": 0xc0,
-  "Á": 0xc1,
-  "Â": 0xc2,
-  "Ã": 0xc3,
-
-  "Ä": 0xc4,
-  "Å": 0xc5,
-  "Æ": 0xc6,
-  "Ç": 0xc7,
-
-  "È": 0xc8,
-  "É": 0xc9,
-  "Ê": 0xca,
-  "Ë": 0xcb,
-  "Ì": 0xcc,
-  "Í": 0xcd,
-  "Î": 0xce,
-  "Ï": 0xcf,
-  "Ð": 0xd0,
-  "Ñ": 0xd1,
-  "Ò": 0xd2,
-  "Ó": 0xd3,
-  "Ô": 0xd4,
-  "Õ": 0xd5,
-  "Ö": 0xd6,
-  "×": 0xd7,
-  "Ø": 0xd8,
-  "Ù": 0xd9,
-  "Ú": 0xda,
-  "Û": 0xdb,
-  "Ü": 0xdc,
-  "Ý": 0xdd,
-  "Þ": 0xde,
-  "ß": 0xdf,
-  "à": 0xe0,
-  "á": 0xe1,
-  "â": 0xe2,
-  "ã": 0xe3,
-  "ä": 0xe4,
-  "å": 0xe5,
-  "æ": 0xe6,
-  "ç": 0xe7,
-  "è": 0xe8,
-  "é": 0xe9,
-  "ê": 0xea,
-  "ë": 0xeb,
-  "ì": 0xec,
-  "í": 0xed,
-  "î": 0xee,
-  "ï": 0xef,
 };
 
 type ControlChar = keyof typeof controlChars;
 
-function getControlChar(byte: number) {
+export function getControlChar(byte: number) {
   for (const key in controlChars) {
     if (controlChars[key as ControlChar] === byte) {
       return key;
@@ -177,11 +95,11 @@ export class ConnectionReader {
 
   data: Uint8Array = new Uint8Array();
 
-  conn: Deno.Conn;
+  conn: Deno.TlsConn;
 
   decoder = new TextDecoder();
 
-  constructor(conn: Deno.Conn) {
+  constructor(conn: Deno.TlsConn) {
     this.offset = 0;
     this.size = 1024;
 
@@ -191,7 +109,7 @@ export class ConnectionReader {
 
   async nextMessage() {
     const count = await this.conn.read(this.buffer);
-
+    console.log("Count", count);
     if (!count) {
       return null;
     }
@@ -340,7 +258,8 @@ export class ConnectionReader {
     this.offset++;
     return this.decode(new Uint8Array(data));
   }
-  readPacket() {
+  async readPacket() {
+    await this.loadContent();
     const length = this.readInt32();
     const padding = this.readByte();
     const payload = this.readBytes(length - padding - 1);
