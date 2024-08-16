@@ -1,4 +1,4 @@
-import { prettyDuration } from "../../../string-utils/mod.ts";
+import { prettyDuration } from "../../../ops-workspace/string-utils/mod.ts";
 import { CommandOutput } from "../commandSession.ts";
 import {
   OpGroup,

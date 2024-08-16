@@ -1,5 +1,6 @@
-import { printUtils } from "../../easy-cli/mod.ts";
-import { BytesMessage, BytesMessageReader } from "../../string-utils/mod.ts";
+import { printUtils } from "@vef/easy-cli";
+
+import { BytesMessage, BytesMessageReader } from "@vef/string-utils";
 
 export interface CommandOutput {
   stdout: string[];
