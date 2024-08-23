@@ -25,9 +25,12 @@ export class CommandSession {
   private stdResult: Uint8Array = new Uint8Array();
   private errResult: Uint8Array = new Uint8Array();
   private abort = new AbortController();
+
+  stdOutCallback: (data: Uint8Array) => void = () => {};
+  stdErrCallback: (data: Uint8Array) => void = () => {};
   constructor(sessionType?: "ssh" | "local", options?: {
-    host: string;
-    username: string;
+    host?: string;
+    username?: string;
     cwd?: string;
     port?: number;
     password?: string;
@@ -100,6 +103,7 @@ export class CommandSession {
       stdout: "piped",
       stdin: "piped",
       signal: this.abort.signal,
+      cwd: options?.cwd,
     });
   }
   async ready(): Promise<void> {
@@ -179,12 +183,14 @@ export class CommandSession {
     this.writer = this.stdin.getWriter();
 
     this.stdReader.onOutput((data) => {
+      this.stdOutCallback(data);
       this.stdResult = new Uint8Array([...this.stdResult, ...data]);
       if (!this._ready) {
         this._ready = true;
       }
     });
     this.errReader.onOutput((data) => {
+      this.stdErrCallback(data);
       this.errResult = new Uint8Array([...this.errResult, ...data]);
     });
     if (this.sessionType === "local") {
