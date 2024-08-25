@@ -13,6 +13,6 @@
   "imports": {
     "#/": "./src/",
     "@vef/color-me": "jsr:@vef/color-me@^1.0.3",
-    "@vef/string-utils": "jsr:@vef/string-utils@^0.1.4"
+    "@vef/string-utils": "jsr:@vef/string-utils@^0.1.5"
   }
 }
