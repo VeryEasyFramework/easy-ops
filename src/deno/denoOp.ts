@@ -119,7 +119,10 @@ export function getDenoOp(): DenoOp {
       const startTime = new Date();
 
       const results = await session.runCommand(command, true);
-
+      let status: "success" | "failed" = "success";
+      if (results.stderr.length > 0) {
+        status = "failed";
+      }
       return {
         duration: 0,
         message: "",

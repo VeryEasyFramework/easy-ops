@@ -94,13 +94,3 @@ export class EasyOps {
     this.tasks.push(task);
   }
 }
-
-const easyOps = new EasyOps();
-
-easyOps.queue("deno", "compile", {
-  script: "src/easyOp.ts",
-  permission: {
-    allow: ["all"],
-  },
-  unstable: ["net"],
-});
