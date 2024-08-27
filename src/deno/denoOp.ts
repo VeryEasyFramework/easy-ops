@@ -25,7 +25,14 @@ type DenoPermission =
   | "hrtime"
   | "all";
 
-type DenoUnstableFlag = "net" | "broadcast-channel";
+type DenoUnstableFlag =
+  | "net"
+  | "broadcast-channel"
+  | "kv"
+  | "cron"
+  | "ffi"
+  | "fs"
+  | "webgpu";
 
 type OutputTarget =
   | "x86_64-unknown-linux-gnu"
