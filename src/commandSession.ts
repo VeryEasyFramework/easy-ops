@@ -1,5 +1,6 @@
-import { printUtils } from "../../easy-cli/mod.ts";
-import { BytesMessage, BytesMessageReader } from "../../string-utils/mod.ts";
+import { printUtils } from "@vef/easy-cli";
+
+import { BytesMessage, BytesMessageReader } from "@vef/string-utils";
 
 export interface CommandOutput {
   stdout: string[];
@@ -24,9 +25,12 @@ export class CommandSession {
   private stdResult: Uint8Array = new Uint8Array();
   private errResult: Uint8Array = new Uint8Array();
   private abort = new AbortController();
+
+  stdOutCallback: (data: Uint8Array) => void = () => {};
+  stdErrCallback: (data: Uint8Array) => void = () => {};
   constructor(sessionType?: "ssh" | "local", options?: {
-    host: string;
-    username: string;
+    host?: string;
+    username?: string;
     cwd?: string;
     port?: number;
     password?: string;
@@ -99,6 +103,7 @@ export class CommandSession {
       stdout: "piped",
       stdin: "piped",
       signal: this.abort.signal,
+      cwd: options?.cwd,
     });
   }
   async ready(): Promise<void> {
@@ -112,7 +117,7 @@ export class CommandSession {
     }
     this.sendLocked = true;
   }
-  private decode(data: Uint8Array) {
+  private decode(data: Uint8Array): string {
     return this.decoder.decode(data);
   }
   get done(): Promise<Deno.CommandStatus> {
@@ -141,7 +146,7 @@ export class CommandSession {
     }
   }
 
-  private setOutput() {
+  private setOutput(): CommandOutput {
     this.output.cwd = "";
     const stdout = this.decode(this.stdResult);
     const stderr = this.decode(this.errResult);
@@ -159,18 +164,21 @@ export class CommandSession {
     return this.output;
   }
 
-  async runCommand(command: string, noOutput?: boolean) {
+  async runCommand(
+    command: string,
+    noOutput?: boolean,
+  ): Promise<CommandOutput> {
     await this.sendCommand(command, noOutput);
     const result = this.setOutput();
     const cwd = await this.getCWD();
     result.cwd = cwd;
     return result;
   }
-  close() {
+  close(): void {
     this.writer.releaseLock();
     this.stdin.close();
   }
-  async start() {
+  async start(): Promise<void> {
     this.process = this.session.spawn();
     this.stdReader = new BytesMessageReader(this.process.stdout);
     this.errReader = new BytesMessageReader(this.process.stderr);
@@ -178,12 +186,14 @@ export class CommandSession {
     this.writer = this.stdin.getWriter();
 
     this.stdReader.onOutput((data) => {
+      this.stdOutCallback(data);
       this.stdResult = new Uint8Array([...this.stdResult, ...data]);
       if (!this._ready) {
         this._ready = true;
       }
     });
-    this.errReader.onOutput((data) => {
+    this.errReader.onOutput((data): void => {
+      this.stdErrCallback(data);
       this.errResult = new Uint8Array([...this.errResult, ...data]);
     });
     if (this.sessionType === "local") {
@@ -192,7 +202,7 @@ export class CommandSession {
     await this.ready();
   }
 
-  async getCWD() {
+  async getCWD(): Promise<string> {
     this.cwd = "";
     await this.sendCommand("pwd");
     const result = this.stdResult;
