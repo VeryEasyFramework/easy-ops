@@ -1,6 +1,6 @@
 {
   "name": "@vef/easy-ops",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "exports": "./mod.ts",
   "publish": {
     "exclude": [
@@ -10,11 +10,12 @@
   },
   "tasks": {
     "dev": "deno run --allow-all --watch dev/main.ts",
-    "check": "deno publish --dry-run"
+    "check": "deno publish --dry-run",
+    "update": "deno add @vef/easy-cli && deno add @vef/string-utils"
   },
   "imports": {
     "#/": "./src/",
-    "@vef/easy-cli": "jsr:@vef/easy-cli@^0.1.16",
+    "@vef/easy-cli": "jsr:@vef/easy-cli@^0.2.0",
     "@vef/string-utils": "jsr:@vef/string-utils@^0.1.5"
   }
 }
