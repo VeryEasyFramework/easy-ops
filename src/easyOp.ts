@@ -59,13 +59,13 @@ export class EasyOps {
       session: CommandSession,
       options: O,
     ) => Promise<TaskResult>;
-    const task = async () => {
+    const task = async (): Promise<TaskResult> => {
       return await action(this.session, options as O);
     };
 
     this.addTask(task);
   }
-  async run() {
+  async run(): Promise<TaskResult[]> {
     let results: TaskResult[] = [];
     for (const task of this.tasks) {
       const result = await task();
@@ -82,7 +82,7 @@ export class EasyOps {
     group: G,
     command: C,
     options: O extends keyof OpsMap[G] ? OpsMap[G][O] : never,
-  ) {
+  ): Promise<TaskResult> {
     const action = this.ops[group][command] as (
       session: CommandSession,
       options: O,

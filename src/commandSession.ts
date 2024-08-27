@@ -117,7 +117,7 @@ export class CommandSession {
     }
     this.sendLocked = true;
   }
-  private decode(data: Uint8Array) {
+  private decode(data: Uint8Array): string {
     return this.decoder.decode(data);
   }
   get done(): Promise<Deno.CommandStatus> {
@@ -146,7 +146,7 @@ export class CommandSession {
     }
   }
 
-  private setOutput() {
+  private setOutput(): CommandOutput {
     this.output.cwd = "";
     const stdout = this.decode(this.stdResult);
     const stderr = this.decode(this.errResult);
@@ -164,18 +164,21 @@ export class CommandSession {
     return this.output;
   }
 
-  async runCommand(command: string, noOutput?: boolean) {
+  async runCommand(
+    command: string,
+    noOutput?: boolean,
+  ): Promise<CommandOutput> {
     await this.sendCommand(command, noOutput);
     const result = this.setOutput();
     const cwd = await this.getCWD();
     result.cwd = cwd;
     return result;
   }
-  close() {
+  close(): void {
     this.writer.releaseLock();
     this.stdin.close();
   }
-  async start() {
+  async start(): Promise<void> {
     this.process = this.session.spawn();
     this.stdReader = new BytesMessageReader(this.process.stdout);
     this.errReader = new BytesMessageReader(this.process.stderr);
@@ -189,7 +192,7 @@ export class CommandSession {
         this._ready = true;
       }
     });
-    this.errReader.onOutput((data) => {
+    this.errReader.onOutput((data): void => {
       this.stdErrCallback(data);
       this.errResult = new Uint8Array([...this.errResult, ...data]);
     });
@@ -199,7 +202,7 @@ export class CommandSession {
     await this.ready();
   }
 
-  async getCWD() {
+  async getCWD(): Promise<string> {
     this.cwd = "";
     await this.sendCommand("pwd");
     const result = this.stdResult;
