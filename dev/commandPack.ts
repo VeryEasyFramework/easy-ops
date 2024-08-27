@@ -1,3 +1,0 @@
-interface CommandPack {
-  packName: string;
-}
