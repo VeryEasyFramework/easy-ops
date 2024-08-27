@@ -13,7 +13,7 @@
   },
   "imports": {
     "#/": "./src/",
-    "@vef/color-me": "jsr:@vef/color-me@^1.0.3",
+    "@vef/easy-cli": "jsr:@vef/easy-cli@^0.1.16",
     "@vef/string-utils": "jsr:@vef/string-utils@^0.1.5"
   }
 }

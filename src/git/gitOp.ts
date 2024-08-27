@@ -1,13 +1,5 @@
-import { prettyDuration } from "@vef/string-utils";
-import type { CommandOutput } from "#/commandSession.ts";
-import {
-  OpGroup,
-  OpTask,
-  type OpTaskOptions,
-  type TaskResult,
-  type ValidationResult,
-} from "#/opTask.ts";
-import { EasyOps } from "#/easyOp.ts";
+import type { OpTaskOptions, TaskResult } from "#/opTask.ts";
+import type { EasyOps } from "#/easyOp.ts";
 
 type GitCommand = "clone" | "pull" | "fetch" | "push" | "commit" | "checkout";
 

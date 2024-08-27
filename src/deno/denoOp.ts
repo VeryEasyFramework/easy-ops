@@ -1,12 +1,5 @@
-import { prettyDuration } from "@vef/string-utils";
-import type { CommandOutput, CommandSession } from "#/commandSession.ts";
-import {
-  OpGroup,
-  OpTask,
-  type OpTaskOptions,
-  type TaskResult,
-  type ValidationResult,
-} from "#/opTask.ts";
+import type { CommandSession } from "#/commandSession.ts";
+import type { TaskResult } from "#/opTask.ts";
 import type { EasyOps } from "#/easyOp.ts";
 type DenoCommand =
   | "run"

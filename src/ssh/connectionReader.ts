@@ -1,6 +1,3 @@
-import { colorMe } from "https://jsr.io/@vef/color-me/1.0.3/src/colorMe.ts";
-import { printUtils } from "@vef/easy-cli";
-
 const controlChars = {
   NUL: 0x00,
   SOH: 0x01,
@@ -200,14 +197,14 @@ export class ConnectionReader {
             result += `[${char}]`;
             continue;
           }
-          result += colorMe.brightRed(`[${char}]`);
+          result += `[${char}]`;
           continue;
         }
       }
       const char = getControlChar(byte);
       if (!char && !this.isAsciiPrintable(byte)) {
         const hex = this.convertToHex(new Uint8Array([byte]));
-        result += colorMe.brightCyan(hex);
+        result += hex;
         continue;
       }
 
@@ -236,7 +233,7 @@ export class ConnectionReader {
     this.offset += 4;
     return num;
   }
-  decode(data: Uint8Array) {
+  decode(data: Uint8Array): string {
     return this.decoder.decode(data);
   }
 

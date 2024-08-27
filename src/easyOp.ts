@@ -1,12 +1,7 @@
 import { CommandSession } from "#/commandSession.ts";
-import type { OpTaskOptions, TaskResult } from "#/opTask.ts";
-import { GitOp, gitOp, GitOpMap } from "#/git/gitOp.ts";
-import {
-  DenoCommand,
-  type DenoOp,
-  DenoOpMap,
-  getDenoOp,
-} from "#/deno/denoOp.ts";
+import type { TaskResult } from "#/opTask.ts";
+import { type GitOp, gitOp, type GitOpMap } from "#/git/gitOp.ts";
+import { type DenoOp, type DenoOpMap, getDenoOp } from "#/deno/denoOp.ts";
 
 type MapKeys<T> = T extends Record<infer K, any> ? K : never;
 export interface OpsMap {
@@ -66,7 +61,7 @@ export class EasyOps {
     this.addTask(task);
   }
   async run(): Promise<TaskResult[]> {
-    let results: TaskResult[] = [];
+    const results: TaskResult[] = [];
     for (const task of this.tasks) {
       const result = await task();
       results.push(result);

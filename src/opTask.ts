@@ -1,4 +1,4 @@
-import { EasyOps } from "#/easyOp.ts";
+import type { EasyOps } from "#/easyOp.ts";
 
 export interface OpTaskOptions {
   args?: string[];
